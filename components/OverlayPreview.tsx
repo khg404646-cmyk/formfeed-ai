@@ -48,40 +48,40 @@ export default function OverlayPreview({
       aria-hidden="true"
     >
       <div
-        className={`absolute z-[61] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900 ring-2 ring-white shadow-md ${dotPos}`}
+        className={`absolute z-[61] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900 ring-2 ring-white shadow-md ${dotPos}`}
       />
 
       <div
-        className={`absolute z-[61] flex h-7 w-7 items-center justify-center opacity-60 ${dotPos}`}
-        style={{ marginTop: "-1rem" }}
+        className={`absolute z-[61] flex h-6 w-6 items-center justify-center opacity-50 ${dotPos}`}
+        style={{ marginTop: "-0.75rem" }}
       >
         <span
-          className={`block h-5 w-0.5 origin-bottom rounded-full bg-slate-400 ${arrowRot}`}
+          className={`block h-4 w-0.5 origin-bottom rounded-full bg-slate-400 ${arrowRot}`}
           aria-hidden
         />
       </div>
 
       <div
-        className={`absolute z-[62] w-[min(252px,90%)] ${popupPos} ${motionClass}`}
+        className={`absolute z-[62] w-[min(228px,88%)] ${popupPos} ${motionClass}`}
       >
-        <div className="rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
-          <div className="flex items-center justify-between gap-2">
-            <span className="rounded-full bg-slate-900 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide text-white">
+        <div className="rounded-lg border border-slate-200/80 bg-white/95 p-2.5 shadow-lg backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="rounded-full bg-slate-900 px-1.5 py-px font-mono text-[9px] font-semibold tracking-wide text-white">
               {timestampLabel}
             </span>
             {selectedArea ? (
-              <span className="shrink-0 rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-800">
+              <span className="shrink-0 rounded border border-slate-200 bg-slate-100 px-1.5 py-px text-[9px] font-semibold text-slate-800">
                 {selectedArea}
               </span>
             ) : null}
           </div>
 
-          <p className="mt-2.5 max-w-full whitespace-pre-wrap break-words text-[17px] font-extrabold leading-snug tracking-tight text-slate-900">
+          <p className="mt-1 max-w-full whitespace-pre-wrap break-words text-[13px] font-extrabold leading-snug tracking-tight text-slate-900">
             {popupText}
           </p>
 
           {detailText ? (
-            <p className="mt-2 max-w-full whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-600">
+            <p className="mt-1 max-w-full whitespace-pre-wrap break-words text-[11px] font-medium leading-snug text-slate-600">
               {detailText}
             </p>
           ) : null}

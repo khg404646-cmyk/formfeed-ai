@@ -6,7 +6,7 @@ const POPUP_POSITION: Record<ArrowPosition, string> = {
   "top-center": "left-1/2 top-[6%] -translate-x-1/2",
   "top-right": "right-[6%] top-[6%]",
   "middle-left": "left-[6%] top-1/2 -translate-y-1/2",
-  "middle-center": "left-1/2 top-[38%] -translate-x-1/2",
+  "middle-center": "left-1/2 top-[32%] -translate-x-1/2",
   "middle-right": "right-[6%] top-1/2 -translate-y-1/2",
   "bottom-left": "left-[6%] bottom-[22%]",
   "bottom-center": "left-1/2 bottom-[20%] -translate-x-1/2",
@@ -35,32 +35,32 @@ const ARROW_ROTATION: Record<ArrowDirection, string> = {
 
 const BOTTOM_ROW: ArrowPosition[] = ["bottom-left", "bottom-center", "bottom-right"];
 
-/** Native controls (~52–64px) + 24px margin + notch — VideoPlayer overlay inset. */
-export const CONTROLS_SAFE_INSET_BOTTOM = "5.75rem";
+/** Custom thin progress bar + padding — VideoPlayer overlay inset. */
+export const CONTROLS_SAFE_INSET_BOTTOM = "2rem";
 
 /** Horizontal breathing room inside 9:16 frame. */
-export const CONTROLS_SAFE_INSET_X = "0.75rem";
+export const CONTROLS_SAFE_INSET_X = "0.5rem";
 
-export const CONTROLS_SAFE_INSET_TOP = "0.75rem";
+export const CONTROLS_SAFE_INSET_TOP = "0.5rem";
 
-/** Bottom inset with safe-area (iOS home indicator, landscape). */
+/** Bottom inset with safe-area (iOS home indicator). */
 export function getOverlaySafeBottom(active: boolean): string | undefined {
   return active
-    ? `max(${CONTROLS_SAFE_INSET_BOTTOM}, calc(env(safe-area-inset-bottom, 0px) + 3.5rem))`
-    : undefined;
+    ? `max(${CONTROLS_SAFE_INSET_BOTTOM}, calc(env(safe-area-inset-bottom, 0px) + 1.25rem))`
+    : "max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem))";
 }
 
-/** Bottom 9-grid cells remap upward so popups never sit on the progress bar. */
+/** Popup active: anchor upper band — keeps athlete center visible on mobile. */
 const POPUP_POSITION_CONTROLS_SAFE: Record<ArrowPosition, string> = {
-  "top-left": POPUP_POSITION["top-left"],
-  "top-center": POPUP_POSITION["top-center"],
-  "top-right": POPUP_POSITION["top-right"],
-  "middle-left": POPUP_POSITION["middle-left"],
-  "middle-center": POPUP_POSITION["middle-center"],
-  "middle-right": POPUP_POSITION["middle-right"],
-  "bottom-left": "left-[6%] top-[44%]",
-  "bottom-center": "left-1/2 top-[40%] -translate-x-1/2",
-  "bottom-right": "right-[6%] top-[44%]",
+  "top-left": "left-[4%] top-[5%]",
+  "top-center": "left-1/2 top-[5%] -translate-x-1/2",
+  "top-right": "right-[4%] top-[5%]",
+  "middle-left": "left-[4%] top-[9%]",
+  "middle-center": "left-1/2 top-[7%] -translate-x-1/2",
+  "middle-right": "right-[4%] top-[9%]",
+  "bottom-left": "left-[4%] top-[11%]",
+  "bottom-center": "left-1/2 top-[9%] -translate-x-1/2",
+  "bottom-right": "right-[4%] top-[11%]",
 };
 
 export function getPopupPositionClass(
