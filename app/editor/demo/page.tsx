@@ -44,7 +44,10 @@ export default function EditorDemoPage() {
         </section>
 
         <section className="mb-5">
-          <button className="w-full rounded-2xl bg-[#111827] px-4 py-4 text-base font-semibold text-white shadow-sm">
+          <button
+            type="button"
+            className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 shadow-none hover:bg-slate-50"
+          >
             이 지점에 피드백
           </button>
         </section>

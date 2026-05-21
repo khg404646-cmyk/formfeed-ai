@@ -761,7 +761,7 @@ export default function EditorSessionPage() {
           type="button"
           onClick={handleOpenCreateModal}
           disabled={!canEdit}
-          className="w-full rounded-2xl bg-[#111827] px-4 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 shadow-none hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           이 지점에 피드백
         </button>
