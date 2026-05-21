@@ -70,6 +70,8 @@ export default function VideoPlayer({
 
   const progressPercent = durationMs > 0 ? (currentTimeMs / durationMs) * 100 : 0;
   const playbackSrc = useMemo(() => getVideoPlaybackSrc(videoUrl), [videoUrl]);
+  /** same-origin 스트림에 crossOrigin을 켜면 iOS Safari에서 검은 화면이 나는 경우가 있음 */
+  const useCrossOrigin = !playbackSrc.startsWith("/");
 
   const clearPauseTimers = useCallback(() => {
     for (const id of pauseTimersRef.current) clearTimeout(id);
@@ -273,8 +275,8 @@ export default function VideoPlayer({
           ref={videoRef}
           src={playbackSrc}
           playsInline
-          preload="auto"
-          crossOrigin="anonymous"
+          preload="metadata"
+          {...(useCrossOrigin ? { crossOrigin: "anonymous" as const } : {})}
           disablePictureInPicture
           controls={false}
           className="ff-video relative z-0 h-full w-full max-h-full object-contain [touch-action:manipulation]"
@@ -343,9 +345,14 @@ export default function VideoPlayer({
 
         {playbackError ? (
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/60 px-4">
-            <p className="text-center text-xs font-semibold leading-relaxed text-white">
-              {USER_MESSAGES.videoLoadFailed}
-            </p>
+            <div className="space-y-2 text-center">
+              <p className="text-xs font-semibold leading-relaxed text-white">
+                {USER_MESSAGES.videoLoadFailed}
+              </p>
+              <p className="text-[10px] leading-relaxed text-white/85">
+                {USER_MESSAGES.videoPlayTapHint}
+              </p>
+            </div>
           </div>
         ) : null}
 

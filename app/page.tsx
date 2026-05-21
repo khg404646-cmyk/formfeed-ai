@@ -6,6 +6,8 @@ import RecentLinks, { notifyRecentLinksUpdated } from "../components/RecentLinks
 import { useVideoUpload } from "../hooks/useVideoUpload";
 import { exerciseTypeLabels } from "../lib/exercise-labels";
 import { InlineError } from "../components/StatusPanels";
+import { getVideoDurationSec } from "../lib/get-video-duration";
+import { MAX_VIDEO_DURATION_SEC } from "../lib/video-limits";
 import { mapSessionCreateError, USER_MESSAGES } from "../lib/user-messages";
 import type {
   ApiErrorBody,
@@ -79,6 +81,18 @@ export default function HomePage() {
     setIsCreating(true);
 
     try {
+      let durationSec: number;
+      try {
+        durationSec = await getVideoDurationSec(file);
+      } catch {
+        setFormError(USER_MESSAGES.videoDurationProbeFailed);
+        return;
+      }
+      if (durationSec > MAX_VIDEO_DURATION_SEC) {
+        setFormError(USER_MESSAGES.videoTooLong);
+        return;
+      }
+
       const { videoUrl } = await uploadVideo(file);
 
       const res = await fetch("/api/sessions", {
@@ -131,7 +145,7 @@ export default function HomePage() {
           </h1>
           <p className="text-sm leading-relaxed text-[#6b7280]">
             운동영상을 올리고, 피드백 지점을 선택하면 AI가 회원용 설명문 초안을
-            작성합니다.
+            작성합니다. 베타 기간에는 30초 이하 mp4 영상을 권장합니다.
           </p>
         </header>
 

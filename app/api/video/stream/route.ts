@@ -88,6 +88,7 @@ export async function GET(request: Request) {
     headers.set("Accept-Ranges", "bytes");
   }
   headers.set("Cache-Control", "public, max-age=86400, immutable");
+  headers.set("Access-Control-Allow-Origin", "*");
 
   return new Response(upstream.body, {
     status: upstream.status,

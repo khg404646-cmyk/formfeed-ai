@@ -12,6 +12,7 @@ import {
   mapGeminiVideoError,
   USER_MESSAGES,
 } from "../../../../lib/user-messages";
+import { MAX_VIDEO_DURATION_MS } from "../../../../lib/video-limits";
 import type { GeminiBulkFeedbackResponse } from "../../../../types/formfeed";
 
 /** 영상 다운로드 + Gemini 분석 — Vercel Pro 최대 300s (Hobby는 플랜 상한 적용) */
@@ -72,6 +73,10 @@ export async function POST(request: Request) {
       typeof durationRaw === "number" && Number.isFinite(durationRaw) && durationRaw > 0
         ? Math.round(durationRaw)
         : undefined;
+
+    if (videoDurationMs && videoDurationMs > MAX_VIDEO_DURATION_MS) {
+      return NextResponse.json({ error: USER_MESSAGES.videoTooLong }, { status: 400 });
+    }
 
     const result: GeminiBulkFeedbackResponse = await analyzeWorkoutVideoBulk(
       body.video_url.trim(),

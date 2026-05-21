@@ -88,6 +88,19 @@ export const USER_MESSAGES = {
   geminiTimeout:
     "영상 분석 시간이 초과되었습니다. Vercel Functions 시간 제한(Fluid Compute)을 켜거나 더 짧은 영상으로 다시 시도해 주세요.",
   geminiAnalyzingVideo: "영상 전체를 분석하는 중...",
+  geminiAnalyzingVideoTitle:
+    "🤖 AI가 영상의 관절 움직임과 해부학적 자세를 정밀 분석하고 있습니다...",
+  geminiAnalyzingVideoDetail:
+    "영상 길이에 따라 1~2분 정도 소요될 수 있으니 잠시만 기다려주세요!",
+  geminiAnalyzingVideoHint:
+    "동시 접속이 많을 때는 대기 시간이 조금 더 걸릴 수 있습니다. 새로고침하지 말고 이 화면을 유지해 주세요.",
+  videoTooLong:
+    "베타 기간에는 30초 이하 영상만 분석할 수 있습니다. 짧은 구간으로 잘라 다시 업로드해 주세요.",
+  videoDurationProbeFailed:
+    "영상 길이를 확인하지 못했습니다. mp4 형식으로 다시 선택해 주세요.",
+  videoPlayTapHint:
+    "영상이 검은 화면이면 한 번 터치해 재생해 보세요. Wi-Fi에서 mp4(H.264)로 다시 업로드하면 재생이 안정적입니다.",
+  geminiRetryAnalysis: "AI 분석 다시 시도",
 } as const;
 
 /** Maps Anthropic/API errors to user-facing AI draft messages. */
@@ -148,6 +161,9 @@ export function mapGeminiVideoError(message?: string): string {
   }
   if (lower.includes("maximum size") || lower.includes("too large")) {
     return USER_MESSAGES.geminiVideoTooLarge;
+  }
+  if (lower.includes("30초") || lower.includes("30 sec")) {
+    return USER_MESSAGES.videoTooLong;
   }
   if (
     lower.includes("fetch failed") ||

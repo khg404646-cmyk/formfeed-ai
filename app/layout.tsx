@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
+import { buildDefaultMetadata } from "../lib/site-metadata";
 import { getSiteUrl } from "../lib/site-url";
 import "./globals.css";
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "FormFeed AI",
-  description: "운동영상에 AI 피드백을 얹어 공유하는 도구",
+  ...buildDefaultMetadata(),
   metadataBase: new URL(siteUrl),
 };
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import AiAnalysisLoadingPanel from "../../../components/AiAnalysisLoadingPanel";
 import FeedbackModal, {
   type FeedbackModalSaveData,
 } from "../../../components/FeedbackModal";
@@ -27,6 +28,7 @@ import {
   LoadingPanel,
 } from "../../../components/StatusPanels";
 import { USER_MESSAGES } from "../../../lib/user-messages";
+import { MAX_VIDEO_DURATION_MS } from "../../../lib/video-limits";
 import type {
   EditorSessionResponse,
   ExerciseType,
@@ -177,6 +179,8 @@ export default function EditorSessionPage() {
         setAiError(
           err instanceof Error ? err.message : "AI 분석 중 오류가 발생했습니다.",
         );
+        aiAnalysisTriggeredRef.current = false;
+        aiAnalysisWantedRef.current = true;
       } finally {
         setAiLoading(false);
       }
@@ -193,16 +197,31 @@ export default function EditorSessionPage() {
       const dur = video.duration;
       if (!dur || !Number.isFinite(dur) || dur <= 0) return;
 
+      const durationMs = Math.round(dur * 1000);
+      if (durationMs > MAX_VIDEO_DURATION_MS) {
+        setAiError(USER_MESSAGES.videoTooLong);
+        aiAnalysisWantedRef.current = false;
+        return;
+      }
+
       aiAnalysisTriggeredRef.current = true;
       aiAnalysisWantedRef.current = false;
       void generateAiFeedback(
         activeSession.video_url,
         activeSession.exercise_type,
-        Math.round(dur * 1000),
+        durationMs,
       );
     },
     [generateAiFeedback],
   );
+
+  const handleRetryAiAnalysis = useCallback(() => {
+    if (!session) return;
+    setAiError(null);
+    aiAnalysisTriggeredRef.current = false;
+    aiAnalysisWantedRef.current = true;
+    tryStartPendingAiAnalysis(videoElementRef.current, session);
+  }, [session, tryStartPendingAiAnalysis]);
 
   const handleVideoReady = useCallback(
     (el: HTMLVideoElement) => {
@@ -748,37 +767,22 @@ export default function EditorSessionPage() {
         </button>
         {actionError && !modalOpen ? <InlineError>{actionError}</InlineError> : null}
 
-        {/* AI 분석 진행 중 스피너 */}
-        {aiLoading ? (
-          <div className="flex items-center justify-center gap-3 rounded-2xl border border-[#e5e7eb] bg-white px-4 py-5">
-            <svg
-              className="h-5 w-5 shrink-0 animate-spin text-[#6366f1]"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-            <p className="text-sm font-semibold text-[#374151]">
-              AI가 영상 전체를 분석하고 있습니다…
-            </p>
+        {aiLoading ? <AiAnalysisLoadingPanel /> : null}
+
+        {aiError && !aiLoading ? (
+          <div className="space-y-2">
+            <InlineError>{aiError}</InlineError>
+            {canEdit ? (
+              <button
+                type="button"
+                onClick={handleRetryAiAnalysis}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
+              >
+                {USER_MESSAGES.geminiRetryAnalysis}
+              </button>
+            ) : null}
           </div>
         ) : null}
-
-        {/* AI 분석 오류 */}
-        {aiError && !aiLoading ? <InlineError>{aiError}</InlineError> : null}
 
         {/* AI 초안 마커 목록 */}
         {aiDraftMarkers.length > 0 ? (

@@ -7,6 +7,7 @@ import VideoPlayer from "../../../components/VideoPlayer";
 import { formatTimestamp } from "../../../lib/demo-data";
 import { getExerciseLabel } from "../../../lib/exercise-labels";
 import { ErrorPanel, LoadingPanel } from "../../../components/StatusPanels";
+import { SHARE_MEMBER_HEADLINE } from "../../../lib/site-metadata";
 import { USER_MESSAGES } from "../../../lib/user-messages";
 import type { FeedbackMarker, FeedbackSession, SharePageResponse } from "../../../types/formfeed";
 
@@ -103,7 +104,7 @@ export default function SharePageClient({ token }: SharePageClientProps) {
             {getExerciseLabel(session.exercise_type)} 자세 피드백
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">
-            트레이너가 보낸 운동 피드백 영상입니다.
+            {SHARE_MEMBER_HEADLINE}
           </p>
         </header>
 
