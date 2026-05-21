@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getExerciseLabel } from "../../../lib/exercise-labels";
+import { getSiteUrl } from "../../../lib/site-url";
 import type { SharePageResponse } from "../../../types/formfeed";
 import SharePageClient from "./SharePageClient";
 
@@ -28,7 +29,7 @@ async function fetchExerciseTypeByShareToken(
   token: string,
 ): Promise<string | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const baseUrl = getSiteUrl();
     const res = await fetch(`${baseUrl}/api/share/${encodeURIComponent(token)}`, {
       cache: "no-store",
     });
