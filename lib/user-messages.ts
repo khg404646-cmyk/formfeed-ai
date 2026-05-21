@@ -83,6 +83,10 @@ export const USER_MESSAGES = {
     "Gemini 모델을 찾을 수 없습니다. .env.local의 GEMINI_MODEL을 gemini-2.5-flash로 설정해 주세요.",
   geminiAnalysisFailed:
     "영상 전체 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+  geminiQuotaExceeded:
+    "Gemini API 사용 한도에 도달했습니다. Google AI Studio에서 할당량을 확인하거나 잠시 후 다시 시도해 주세요.",
+  geminiTimeout:
+    "영상 분석 시간이 초과되었습니다. Vercel Functions 시간 제한(Fluid Compute)을 켜거나 더 짧은 영상으로 다시 시도해 주세요.",
   geminiAnalyzingVideo: "영상 전체를 분석하는 중...",
 } as const;
 
@@ -123,10 +127,34 @@ export function mapGeminiVideoError(message?: string): string {
   if (lower.includes("gemini_api_key") || lower.includes("api key")) {
     return USER_MESSAGES.geminiApiKeyMissing;
   }
+  if (
+    lower.includes("quota") ||
+    lower.includes("rate limit") ||
+    lower.includes("resource exhausted") ||
+    lower.includes("429") ||
+    lower.includes("too many requests")
+  ) {
+    return USER_MESSAGES.geminiQuotaExceeded;
+  }
+  if (
+    lower.includes("timeout") ||
+    lower.includes("timed out") ||
+    lower.includes("deadline") ||
+    lower.includes("function_invocation") ||
+    lower.includes("aborted") ||
+    lower.includes("504")
+  ) {
+    return USER_MESSAGES.geminiTimeout;
+  }
   if (lower.includes("maximum size") || lower.includes("too large")) {
     return USER_MESSAGES.geminiVideoTooLarge;
   }
-  if (lower.includes("fetch failed") || lower.includes("video fetch")) {
+  if (
+    lower.includes("fetch failed") ||
+    lower.includes("video fetch") ||
+    lower.includes("http 403") ||
+    lower.includes("http 404")
+  ) {
     return USER_MESSAGES.geminiVideoFetchFailed;
   }
   if (

@@ -21,6 +21,14 @@
 
 `VERCEL_URL`은 Vercel이 자동 주입합니다. `NEXT_PUBLIC_SITE_URL`이 비어 있어도 메타데이터는 동작합니다.
 
+### 영상 AI 분석 (`/api/ai/generate-feedback`)
+
+- 라우트 `maxDuration`: **300초** (`vercel.json` + `route.ts`)
+- Hobby 플랜은 Vercel 상한(기본 10초)이 적용될 수 있음 → **Settings → Functions → Fluid Compute** 켜고 Redeploy
+- Pro 이상이면 300초까지 영상 분석에 유리
+
+필수 환경 변수: `GEMINI_API_KEY`, `R2_PUBLIC_URL`, `R2_*`, Supabase 키
+
 ### 배포 확인
 
 1. Deployments → 최신 Production → **Visit** 클릭

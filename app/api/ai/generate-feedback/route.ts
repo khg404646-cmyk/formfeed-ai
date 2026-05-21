@@ -14,6 +14,9 @@ import {
 } from "../../../../lib/user-messages";
 import type { GeminiBulkFeedbackResponse } from "../../../../types/formfeed";
 
+/** 영상 다운로드 + Gemini 분석 — Vercel Pro 최대 300s (Hobby는 플랜 상한 적용) */
+export const maxDuration = 300;
+
 function isValidVideoUrl(value: unknown): value is string {
   if (typeof value !== "string" || !value.trim()) return false;
   try {
