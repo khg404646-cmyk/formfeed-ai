@@ -44,7 +44,7 @@ export default function OverlayPreview({
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[60] overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-[60] overflow-visible"
       aria-hidden="true"
     >
       <div
@@ -64,7 +64,7 @@ export default function OverlayPreview({
       <div
         className={`absolute z-[62] w-[min(252px,90%)] ${popupPos} ${motionClass}`}
       >
-        <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
+        <div className="rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between gap-2">
             <span className="rounded-full bg-slate-900 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide text-white">
               {timestampLabel}
@@ -76,12 +76,12 @@ export default function OverlayPreview({
             ) : null}
           </div>
 
-          <p className="mt-2.5 line-clamp-2 max-w-full break-words text-[17px] font-extrabold leading-tight tracking-tight text-slate-900">
+          <p className="mt-2.5 max-w-full whitespace-pre-wrap break-words text-[17px] font-extrabold leading-snug tracking-tight text-slate-900">
             {popupText}
           </p>
 
           {detailText ? (
-            <p className="mt-2 line-clamp-2 max-w-full break-words text-xs leading-relaxed text-slate-600">
+            <p className="mt-2 max-w-full whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-600">
               {detailText}
             </p>
           ) : null}
