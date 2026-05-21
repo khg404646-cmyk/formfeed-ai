@@ -14,7 +14,7 @@ export default function EditorDemoPage() {
             스쿼트 피드백 편집
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">
-            문제 지점에서 영상을 멈추고 AI 피드백을 추가하세요.
+            문제 지점에서 영상을 멈추고 피드백을 추가하세요.
           </p>
         </header>
 
@@ -45,7 +45,7 @@ export default function EditorDemoPage() {
 
         <section className="mb-5">
           <button className="w-full rounded-2xl bg-[#111827] px-4 py-4 text-base font-semibold text-white shadow-sm">
-            이 지점에 AI 피드백 추가
+            이 지점에 피드백
           </button>
         </section>
 

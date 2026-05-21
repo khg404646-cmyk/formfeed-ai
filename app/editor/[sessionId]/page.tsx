@@ -410,19 +410,12 @@ export default function EditorSessionPage() {
     setCaptureError(null);
     setMarkerTimestampMs(currentTimeMs);
 
-    if (!videoElement) {
-      setCaptureImageBase64(undefined);
-      setCaptureError(USER_MESSAGES.frameCaptureNotReady);
-    } else {
+    if (videoElement) {
       try {
         const dataUrl = captureVideoFrame(videoElement);
         setCaptureImageBase64(dataUrl);
-        setCaptureError(null);
-      } catch (err) {
-        setCaptureImageBase64(undefined);
-        setCaptureError(
-          err instanceof Error ? err.message : USER_MESSAGES.frameCaptureFailed,
-        );
+      } catch {
+        setCaptureError(USER_MESSAGES.frameCaptureFailed);
       }
     }
 
@@ -751,7 +744,7 @@ export default function EditorSessionPage() {
           disabled={!canEdit}
           className="w-full rounded-2xl bg-[#111827] px-4 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          이 지점에 AI 피드백 추가
+          이 지점에 피드백
         </button>
         {actionError && !modalOpen ? <InlineError>{actionError}</InlineError> : null}
 
