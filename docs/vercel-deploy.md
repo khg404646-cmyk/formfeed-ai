@@ -24,6 +24,7 @@
 ### 영상 AI 분석 (`/api/ai/generate-feedback`)
 
 - 라우트 `maxDuration`: **300초** (`vercel.json` + `route.ts`)
+- **Fluid Compute** 활성화 권장 — Hobby 기본 10~60초 제한이면 AI 분석이 길게 돌다 504로 실패합니다.
 - Hobby 플랜은 Vercel 상한(기본 10초)이 적용될 수 있음 → **Settings → Functions → Fluid Compute** 켜고 Redeploy
 - Pro 이상이면 300초까지 영상 분석에 유리
 

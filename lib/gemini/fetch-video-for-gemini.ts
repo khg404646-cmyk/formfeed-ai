@@ -1,4 +1,7 @@
-import { GEMINI_VIDEO_FETCH_MAX_BYTES } from "./gemini-config";
+import {
+  GEMINI_VIDEO_FETCH_MAX_BYTES,
+  GEMINI_VIDEO_FETCH_TIMEOUT_MS,
+} from "./gemini-config";
 
 export type FetchedVideo = {
   buffer: Buffer;
@@ -22,7 +25,7 @@ function mimeFromContentType(header: string | null): string | null {
 
 export async function fetchVideoForGemini(videoUrl: string): Promise<FetchedVideo> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 120_000);
+  const timeout = setTimeout(() => controller.abort(), GEMINI_VIDEO_FETCH_TIMEOUT_MS);
 
   try {
     const res = await fetch(videoUrl, {

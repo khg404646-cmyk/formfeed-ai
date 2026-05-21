@@ -78,15 +78,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: USER_MESSAGES.videoTooLong }, { status: 400 });
     }
 
+    const started = Date.now();
     const result: GeminiBulkFeedbackResponse = await analyzeWorkoutVideoBulk(
       body.video_url.trim(),
       exerciseRaw,
       videoDurationMs,
     );
+    if (!result.analysis?.length) {
+      return NextResponse.json(
+        { error: USER_MESSAGES.geminiEmptyAnalysis },
+        { status: 422 },
+      );
+    }
+    console.info(
+      `[generate-feedback] ok items=${result.analysis.length} ms=${Date.now() - started}`,
+    );
     return NextResponse.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown Gemini error";
+    const isTimeout =
+      message.includes("TIMEOUT:") ||
+      message.toLowerCase().includes("aborted");
     console.error("[generate-feedback]", message);
-    return NextResponse.json({ error: mapGeminiVideoError(message) }, { status: 500 });
+    return NextResponse.json(
+      { error: mapGeminiVideoError(message) },
+      { status: isTimeout ? 504 : 500 },
+    );
   }
 }

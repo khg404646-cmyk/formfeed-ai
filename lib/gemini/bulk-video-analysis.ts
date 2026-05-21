@@ -13,10 +13,15 @@ import {
 } from "./bulk-analysis-prompt";
 import { fetchVideoForGemini } from "./fetch-video-for-gemini";
 import {
+  GEMINI_BULK_ANALYSIS_MAX_BYTES,
+  GEMINI_BULK_TOTAL_TIMEOUT_MS,
+  GEMINI_FILE_PROCESSING_TIMEOUT_MS,
+  GEMINI_GENERATE_TIMEOUT_MS,
   GEMINI_INLINE_VIDEO_MAX_BYTES,
   getGeminiApiKey,
   getGeminiModel,
 } from "./gemini-config";
+import { withTimeout } from "./with-timeout";
 import { spreadAnalysisTimestamps } from "./spread-analysis-timestamps";
 import { validateGeminiBulkResponse } from "./validate-bulk-response";
 
@@ -113,14 +118,18 @@ async function buildVideoPart(
   });
 
   let file = upload.file;
-  const deadline = Date.now() + 120_000;
+  const deadline = Date.now() + GEMINI_FILE_PROCESSING_TIMEOUT_MS;
   while (file.state === "PROCESSING" && Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 1500));
     file = await fileManager.getFile(file.name);
   }
 
   if (file.state !== "ACTIVE") {
-    throw new Error(`Gemini file processing failed: ${file.state}`);
+    throw new Error(
+      file.state === "PROCESSING"
+        ? "TIMEOUT:gemini-file-processing"
+        : `Gemini file processing failed: ${file.state}`,
+    );
   }
 
   return {
@@ -131,7 +140,42 @@ async function buildVideoPart(
   };
 }
 
-export async function analyzeWorkoutVideoBulk(
+function isTransientGeminiError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+  return (
+    msg.includes("429") ||
+    msg.includes("503") ||
+    msg.includes("resource exhausted") ||
+    msg.includes("overloaded") ||
+    msg.includes("unavailable")
+  );
+}
+
+async function generateBulkContentOnce(
+  apiKey: string,
+  videoPart: Part,
+  userPrompt: string,
+) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: getGeminiModel(),
+    systemInstruction: GEMINI_BULK_SYSTEM_INSTRUCTION,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: RESPONSE_SCHEMA,
+      temperature: 0.2,
+      maxOutputTokens: 4096,
+    },
+  });
+
+  return withTimeout(
+    model.generateContent([videoPart, { text: userPrompt }]),
+    GEMINI_GENERATE_TIMEOUT_MS,
+    "gemini-generate",
+  );
+}
+
+async function runBulkAnalysis(
   videoUrl: string,
   exerciseType: ExerciseType,
   videoDurationMs?: number,
@@ -142,23 +186,25 @@ export async function analyzeWorkoutVideoBulk(
   }
 
   const { buffer, mimeType } = await fetchVideoForGemini(videoUrl);
-  const videoPart = await buildVideoPart(apiKey, buffer, mimeType);
 
+  if (buffer.length > GEMINI_BULK_ANALYSIS_MAX_BYTES) {
+    throw new Error(
+      `Video file exceeds bulk analysis limit (${GEMINI_BULK_ANALYSIS_MAX_BYTES} bytes). Use a shorter or more compressed mp4.`,
+    );
+  }
+
+  const videoPart = await buildVideoPart(apiKey, buffer, mimeType);
   const userPrompt = buildGeminiBulkUserPrompt(exerciseType);
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: getGeminiModel(),
-    systemInstruction: GEMINI_BULK_SYSTEM_INSTRUCTION,
-    generationConfig: {
-      responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA,
-      temperature: 0.2,
-      maxOutputTokens: 8192,
-    },
-  });
+  let result;
+  try {
+    result = await generateBulkContentOnce(apiKey, videoPart, userPrompt);
+  } catch (firstErr) {
+    if (!isTransientGeminiError(firstErr)) throw firstErr;
+    await new Promise((r) => setTimeout(r, 4000));
+    result = await generateBulkContentOnce(apiKey, videoPart, userPrompt);
+  }
 
-  const result = await model.generateContent([videoPart, { text: userPrompt }]);
   const text = result.response.text();
   if (!text?.trim()) {
     throw new Error("Empty response from Gemini");
@@ -179,4 +225,16 @@ export async function analyzeWorkoutVideoBulk(
   return {
     analysis: spreadAnalysisTimestamps(validated.analysis, videoDurationMs),
   };
+}
+
+export async function analyzeWorkoutVideoBulk(
+  videoUrl: string,
+  exerciseType: ExerciseType,
+  videoDurationMs?: number,
+): Promise<GeminiBulkFeedbackResponse> {
+  return withTimeout(
+    runBulkAnalysis(videoUrl, exerciseType, videoDurationMs),
+    GEMINI_BULK_TOTAL_TIMEOUT_MS,
+    "bulk-analysis",
+  );
 }

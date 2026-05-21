@@ -27,6 +27,7 @@ import {
   InlineWarning,
   LoadingPanel,
 } from "../../../components/StatusPanels";
+import { requestGenerateFeedback } from "../../../lib/ai-generate-feedback-client";
 import { USER_MESSAGES } from "../../../lib/user-messages";
 import { MAX_VIDEO_DURATION_MS } from "../../../lib/video-limits";
 import type {
@@ -35,7 +36,6 @@ import type {
   FeedbackMarker,
   FeedbackSession,
   GeminiAnalysisItem,
-  GeminiBulkFeedbackResponse,
   MarkersListResponse,
   RecentLinkItem,
 } from "../../../types/formfeed";
@@ -114,6 +114,7 @@ export default function EditorSessionPage() {
   // AI draft state
   const [aiDraftMarkers, setAiDraftMarkers] = useState<AiDraftMarker[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiLoadingStartedAt, setAiLoadingStartedAt] = useState<number | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
   const [showAiBanner, setShowAiBanner] = useState(false);
   const [savingAllDrafts, setSavingAllDrafts] = useState(false);
@@ -151,30 +152,20 @@ export default function EditorSessionPage() {
       videoDurationMs?: number,
     ) => {
       setAiLoading(true);
+      setAiLoadingStartedAt(Date.now());
       setAiError(null);
       try {
-        const res = await fetch("/api/ai/generate-feedback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            video_url: videoUrl,
-            exercise_type: exerciseType,
-            ...(videoDurationMs && videoDurationMs > 0
-              ? { video_duration_ms: videoDurationMs }
-              : {}),
-          }),
+        const data = await requestGenerateFeedback({
+          video_url: videoUrl,
+          exercise_type: exerciseType,
+          ...(videoDurationMs && videoDurationMs > 0
+            ? { video_duration_ms: videoDurationMs }
+            : {}),
         });
-        if (!res.ok) {
-          const body = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(body.error ?? "AI 분석에 실패했습니다.");
-        }
-        const data = (await res.json()) as GeminiBulkFeedbackResponse;
-        if (data.analysis && data.analysis.length > 0) {
-          setAiDraftMarkers(
-            data.analysis.map((item) => ({ ...item, draft_id: makeDraftId() })),
-          );
-          setShowAiBanner(true);
-        }
+        setAiDraftMarkers(
+          data.analysis.map((item) => ({ ...item, draft_id: makeDraftId() })),
+        );
+        setShowAiBanner(true);
       } catch (err) {
         setAiError(
           err instanceof Error ? err.message : "AI 분석 중 오류가 발생했습니다.",
@@ -183,6 +174,7 @@ export default function EditorSessionPage() {
         aiAnalysisWantedRef.current = true;
       } finally {
         setAiLoading(false);
+        setAiLoadingStartedAt(null);
       }
     },
     [],
@@ -767,11 +759,19 @@ export default function EditorSessionPage() {
         </button>
         {actionError && !modalOpen ? <InlineError>{actionError}</InlineError> : null}
 
-        {aiLoading ? <AiAnalysisLoadingPanel /> : null}
+        {aiLoading ? (
+          <AiAnalysisLoadingPanel startedAt={aiLoadingStartedAt} />
+        ) : null}
 
         {aiError && !aiLoading ? (
           <div className="space-y-2">
             <InlineError>{aiError}</InlineError>
+            {aiError === USER_MESSAGES.videoTooLong ||
+            aiError === USER_MESSAGES.geminiVideoTooLargeForBeta ? (
+              <p className="text-[10px] leading-relaxed text-slate-400">
+                {USER_MESSAGES.videoLimitExpansionNote}
+              </p>
+            ) : null}
             {canEdit ? (
               <button
                 type="button"

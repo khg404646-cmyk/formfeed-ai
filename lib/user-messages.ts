@@ -79,6 +79,12 @@ export const USER_MESSAGES = {
   geminiVideoFetchFailed:
     "영상을 불러오지 못했습니다. R2 URL이 공개되어 있는지 확인해 주세요.",
   geminiVideoTooLarge: "분석 가능한 영상 크기(100MB)를 초과했습니다.",
+  geminiVideoTooLargeForBeta:
+    "영상 파일이 커서 AI 분석 준비에 오래 걸리다 실패할 수 있습니다. 30초 이하·용량 작은 mp4(H.264)로 다시 업로드해 주세요.",
+  geminiEmptyAnalysis:
+    "AI가 피드백 초안을 만들지 못했습니다. 영상이 짧고 선명한지 확인한 뒤 「AI 분석 다시 시도」를 눌러 주세요.",
+  geminiNetworkInterrupted:
+    "분석 중 연결이 끊겼습니다. Wi-Fi 환경에서 새로고침 없이 「AI 분석 다시 시도」를 눌러 주세요.",
   geminiModelNotFound:
     "Gemini 모델을 찾을 수 없습니다. .env.local의 GEMINI_MODEL을 gemini-2.5-flash로 설정해 주세요.",
   geminiAnalysisFailed:
@@ -91,11 +97,15 @@ export const USER_MESSAGES = {
   geminiAnalyzingVideoTitle:
     "🤖 AI가 영상의 관절 움직임과 해부학적 자세를 정밀 분석하고 있습니다...",
   geminiAnalyzingVideoDetail:
-    "영상 길이에 따라 1~2분 정도 소요될 수 있으니 잠시만 기다려주세요!",
+    "영상 길이에 따라 보통 1~2분, 파일이 크면 최대 4분까지 걸릴 수 있습니다.",
   geminiAnalyzingVideoHint:
     "동시 접속이 많을 때는 대기 시간이 조금 더 걸릴 수 있습니다. 새로고침하지 말고 이 화면을 유지해 주세요.",
   videoTooLong:
-    "베타 기간에는 30초 이하 영상만 분석할 수 있습니다. 짧은 구간으로 잘라 다시 업로드해 주세요.",
+    "현재는 30초 이하 영상만 분석할 수 있습니다. 짧은 구간으로 잘라 다시 업로드해 주세요.",
+  videoLimitExpansionNote:
+    "영상 길이·용량 제한은 추후 확장 예정입니다.",
+  videoUploadRecommended:
+    "30초 이하 · 약 22MB 이하 권장",
   videoDurationProbeFailed:
     "영상 길이를 확인하지 못했습니다. mp4 형식으로 다시 선택해 주세요.",
   videoPlayTapHint:
@@ -159,8 +169,24 @@ export function mapGeminiVideoError(message?: string): string {
   ) {
     return USER_MESSAGES.geminiTimeout;
   }
+  if (
+    lower.includes("bulk analysis limit") ||
+    lower.includes("exceeds bulk")
+  ) {
+    return USER_MESSAGES.geminiVideoTooLargeForBeta;
+  }
   if (lower.includes("maximum size") || lower.includes("too large")) {
     return USER_MESSAGES.geminiVideoTooLarge;
+  }
+  if (
+    lower.includes("empty response") ||
+    lower.includes("schema validation") ||
+    lower.includes("invalid json")
+  ) {
+    return USER_MESSAGES.geminiEmptyAnalysis;
+  }
+  if (lower.includes("file processing")) {
+    return USER_MESSAGES.geminiVideoTooLargeForBeta;
   }
   if (lower.includes("30초") || lower.includes("30 sec")) {
     return USER_MESSAGES.videoTooLong;
