@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatTimestamp } from "../lib/demo-data";
+import { getVideoPlaybackSrc } from "../lib/video-playback-url";
 import {
   CONTROLS_SAFE_INSET_TOP,
   CONTROLS_SAFE_INSET_X,
@@ -68,6 +69,7 @@ export default function VideoPlayer({
   );
 
   const progressPercent = durationMs > 0 ? (currentTimeMs / durationMs) * 100 : 0;
+  const playbackSrc = useMemo(() => getVideoPlaybackSrc(videoUrl), [videoUrl]);
 
   const clearPauseTimers = useCallback(() => {
     for (const id of pauseTimersRef.current) clearTimeout(id);
@@ -109,13 +111,17 @@ export default function VideoPlayer({
     [seekToRatio],
   );
 
-  const togglePlayback = useCallback(() => {
+  const togglePlayback = useCallback(async () => {
     const video = videoRef.current;
     if (!video || playbackError) return;
-    if (video.paused) {
-      void video.play().catch(() => {});
-    } else {
-      video.pause();
+    try {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+    } catch {
+      setPlaybackError(true);
     }
   }, [playbackError]);
 
@@ -263,15 +269,15 @@ export default function VideoPlayer({
     <div className={containerClass} data-mode={mode}>
       <div className="relative aspect-[9/16] w-full max-w-full overflow-hidden bg-black">
         <video
-          key={videoUrl}
+          key={playbackSrc}
           ref={videoRef}
-          src={videoUrl}
+          src={playbackSrc}
           playsInline
-          preload="metadata"
+          preload="auto"
           crossOrigin="anonymous"
           disablePictureInPicture
           controls={false}
-          className="ff-video relative z-0 h-full w-full max-h-full object-contain"
+          className="ff-video relative z-0 h-full w-full max-h-full object-contain [touch-action:manipulation]"
           onLoadedMetadata={(event) => {
             const video = event.currentTarget;
             setPlaybackError(false);
@@ -304,14 +310,20 @@ export default function VideoPlayer({
             prevTimeMsRef.current = Math.floor(event.currentTarget.currentTime * 1000);
           }}
           onError={() => setPlaybackError(true)}
+          onCanPlay={(event) => {
+            event.currentTarget.removeAttribute("poster");
+          }}
         />
 
         {!playbackError ? (
           <button
             type="button"
-            className="absolute inset-x-0 top-0 z-[15] cursor-pointer border-0 bg-transparent p-0 outline-none"
+            className="absolute inset-x-0 top-0 z-[15] cursor-pointer touch-manipulation border-0 bg-transparent p-0 outline-none [-webkit-tap-highlight-color:transparent]"
             style={{ bottom: `${PROGRESS_HIT_HEIGHT_PX}px` }}
-            onClick={togglePlayback}
+            onPointerUp={(event) => {
+              event.preventDefault();
+              void togglePlayback();
+            }}
             aria-label={isPlaying ? "일시정지" : "재생"}
           />
         ) : null}

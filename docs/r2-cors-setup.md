@@ -34,6 +34,11 @@ Cloudflare Dashboard에서:
 - video 태그에는 crossOrigin="anonymous"를 넣어야 한다.
 - R2 public URL로 접근 가능한 영상이어야 한다.
 
+## 모바일 재생 (iOS Safari)
+- VideoPlayer는 R2 URL을 `/api/video/stream` same-origin 프록시로 재생합니다 (Range 요청 지원).
+- **재생**은 프록시만으로도 동작할 수 있습니다.
+- **프레임 캡처(canvas)** 는 여전히 R2 CORS가 필요할 수 있습니다 — AllowedMethods에 `GET`, `HEAD` 포함.
+
 ## 캡처 실패 시 체크리스트
 - R2 CORS 설정 적용 여부
 - video 태그 crossOrigin="anonymous"
