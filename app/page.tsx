@@ -148,8 +148,7 @@ export default function HomePage() {
             회원 운동영상 피드백을 만들어보세요.
           </h1>
           <p className="text-sm leading-relaxed text-[#6b7280]">
-            운동영상을 올리고, 피드백 지점을 선택하면 AI가 회원용 설명문 초안을
-            작성합니다. {USER_MESSAGES.videoUploadRecommended} (mp4)
+            운동 영상을 올리면 AI가 피드백 초안을 만들어요. {USER_MESSAGES.videoUploadRecommended}
           </p>
           <p className="text-[11px] leading-relaxed text-slate-400">
             {USER_MESSAGES.videoLimitExpansionNote}
@@ -186,9 +185,7 @@ export default function HomePage() {
               {USER_MESSAGES.videoUploadRecommended}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-[#6b7280]">
-              10~30초, 전신이 나오게 촬영
-              <br />
-              mp4(H.264) 권장 · mov, webm
+              전신이 보이게 · mp4 권장
             </p>
             <p className="mt-2 text-[10px] leading-relaxed text-slate-400">
               {USER_MESSAGES.videoLimitExpansionNote}

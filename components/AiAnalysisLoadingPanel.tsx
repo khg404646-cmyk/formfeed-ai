@@ -50,7 +50,7 @@ export default function AiAnalysisLoadingPanel({
           />
         </svg>
         <div className="min-w-0 space-y-2">
-          <p className="text-sm font-bold leading-snug text-slate-900">
+          <p className="text-sm font-semibold leading-snug text-slate-900">
             {USER_MESSAGES.geminiAnalyzingVideoTitle}
           </p>
           <p className="text-xs leading-relaxed text-slate-600">

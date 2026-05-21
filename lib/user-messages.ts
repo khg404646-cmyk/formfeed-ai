@@ -1,4 +1,5 @@
 import type { ExerciseType } from "../types/formfeed";
+import { MAX_VIDEO_DURATION_SEC, MAX_VIDEO_FILE_MB } from "./video-limits";
 
 const EXERCISE_TYPES: ExerciseType[] = [
   "auto",
@@ -14,102 +15,76 @@ export function isExerciseType(value: string): value is ExerciseType {
   return (EXERCISE_TYPES as readonly string[]).includes(value);
 }
 
+/** 길이·용량 초과 시 공통 안내 */
+export const videoUploadLimitHint = `용량이 너무 커요. ${MAX_VIDEO_DURATION_SEC}초 이하, ${MAX_VIDEO_FILE_MB}MB 미만으로 업로드해 주세요.`;
+
 /** 사용자-facing 한국어 안내 문구 */
 export const USER_MESSAGES = {
-  uploadFailed:
-    "영상 업로드에 실패했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.",
-  fileSizeExceeded:
-    "파일 용량은 300MB를 넘을 수 없습니다. 더 짧거나 용량이 작은 영상으로 다시 시도해 주세요.",
-  sessionCreateFailed:
-    "피드백 세션을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  uploadFailed: "업로드에 실패했어요. 네트워크 확인 후 다시 시도해 주세요.",
+  fileSizeExceeded: "용량이 너무 커요. 300MB 미만 파일만 올릴 수 있어요.",
+  sessionCreateFailed: "세션을 만들지 못했어요. 잠시 후 다시 시도해 주세요.",
   sessionCreateDbSetup:
-    "데이터베이스 테이블이 없습니다. Supabase 대시보드 → SQL Editor에서 프로젝트 폴더의 supabase/schema.sql 전체를 실행한 뒤 다시 시도해 주세요.",
-  exerciseRequired: "운동 종목을 선택하거나 자동 감지를 선택해 주세요.",
+    "DB 테이블이 없어요. Supabase SQL Editor에서 supabase/schema.sql을 실행해 주세요.",
+  exerciseRequired: "운동 종목을 선택해 주세요.",
   fileRequired: "영상 파일을 선택해 주세요.",
-  processingUpload: "영상을 업로드하는 중...",
-  processingSession: "피드백 세션을 만드는 중...",
+  processingUpload: "영상 업로드 중…",
+  processingSession: "세션 준비 중…",
 
   editPermissionMissing:
-    "편집 권한을 찾을 수 없습니다. 처음 만든 브라우저에서 다시 열거나 편집 링크로 접속해 주세요.",
-  editTokenLostHint:
-    "편집 링크(edit_token)가 없습니다. 처음 받은 편집 링크 전체를 복사해 다시 열어 주세요.",
-  editPermissionAction: "편집 권한이 없어 이 작업을 할 수 없습니다.",
-  markerSaveFailed:
-    "마커 저장에 실패했습니다. 입력 내용을 확인한 뒤 다시 시도해 주세요.",
-  aiDraftSaveAllInProgress: "AI 초안을 모두 저장하는 중...",
-  aiDraftSaveAllFailed:
-    "일부 초안을 저장하지 못했습니다. 실패한 항목을 확인한 뒤 다시 시도해 주세요.",
-  aiDraftSaveAllSuccess: "AI 초안을 모두 저장했습니다.",
-  markerUpdateFailed:
-    "마커 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-  markerDeleteFailed:
-    "마커 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-  sessionLoadFailed:
-    "편집 화면을 불러오지 못했습니다. 링크를 확인한 뒤 다시 시도해 주세요.",
-  editorLoading: "편집 화면을 불러오는 중...",
+    "편집 권한이 없어요. 처음 연 브라우저나 편집 링크로 다시 열어 주세요.",
+  editTokenLostHint: "편집 링크가 없어요. 받은 링크 전체를 복사해 다시 열어 주세요.",
+  editPermissionAction: "편집 권한이 없어 이 작업을 할 수 없어요.",
+  markerSaveFailed: "저장에 실패했어요. 내용 확인 후 다시 시도해 주세요.",
+  aiDraftSaveAllInProgress: "AI 초안 저장 중…",
+  aiDraftSaveAllFailed: "일부 초안을 저장하지 못했어요. 다시 시도해 주세요.",
+  aiDraftSaveAllSuccess: "AI 초안을 모두 저장했어요.",
+  markerUpdateFailed: "수정에 실패했어요. 잠시 후 다시 시도해 주세요.",
+  markerDeleteFailed: "삭제에 실패했어요. 잠시 후 다시 시도해 주세요.",
+  sessionLoadFailed: "편집 화면을 불러오지 못했어요. 링크를 확인해 주세요.",
+  editorLoading: "불러오는 중…",
 
-  shareLinkInvalid:
-    "공유 링크가 올바르지 않습니다. 트레이너에게 받은 링크를 다시 확인해 주세요.",
-  shareNotFound:
-    "피드백을 찾을 수 없습니다. 링크가 만료되었거나 잘못되었을 수 있습니다.",
-  shareLoadFailed:
-    "피드백을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
-  shareLoading: "피드백을 불러오는 중...",
+  shareLinkInvalid: "공유 링크가 올바르지 않아요.",
+  shareNotFound: "피드백을 찾을 수 없어요. 링크를 확인해 주세요.",
+  shareLoadFailed: "불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
+  shareLoading: "불러오는 중…",
 
-  videoLoadFailed:
-    "영상을 불러오지 못했습니다. 링크가 잘못되었거나 영상이 삭제되었을 수 있습니다.",
-  frameCaptureFailed:
-    "프레임 캡처에 실패했습니다. R2 CORS 설정을 확인해 주세요.",
-  frameCaptureNotReady:
-    "영상이 준비되기 전에는 프레임을 캡처할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+  videoLoadFailed: "영상을 불러오지 못했어요.",
+  frameCaptureFailed: "프레임 캡처에 실패했어요.",
+  frameCaptureNotReady: "영상 준비 후 다시 시도해 주세요.",
 
-  aiDraftFailed:
-    "AI 초안 생성에 실패했습니다. 직접 작성하거나 다시 시도해 주세요.",
+  aiDraftFailed: "AI 초안 생성에 실패했어요. 직접 작성하거나 다시 시도해 주세요.",
   aiModelNotFound:
-    "AI 모델을 찾을 수 없습니다. .env.local의 ANTHROPIC_MODEL을 claude-sonnet-4-6 등 최신 Vision 모델로 바꿔 주세요.",
-  aiApiKeyMissing:
-    "AI API 키가 설정되지 않았습니다. .env.local에 ANTHROPIC_API_KEY를 추가해 주세요.",
-  aiImageTooLarge:
-    "캡처 이미지가 너무 큽니다. 영상을 다시 선택하거나 짧은 구간에서 다시 시도해 주세요.",
-  aiGenerating: "AI 초안 작성 중...",
-  aiAnalyzingPose: "자세 분석 중...",
-  aiInferringMovement: "동작·장비 인식 중...",
+    "AI 모델을 찾을 수 없어요. .env.local의 ANTHROPIC_MODEL을 확인해 주세요.",
+  aiApiKeyMissing: "AI API 키가 없어요. .env.local에 ANTHROPIC_API_KEY를 넣어 주세요.",
+  aiImageTooLarge: "이미지가 너무 커요. 짧은 구간에서 다시 시도해 주세요.",
+  aiGenerating: "AI 초안 작성 중…",
+  aiAnalyzingPose: "자세 분석 중…",
+  aiInferringMovement: "동작 인식 중…",
 
-  geminiApiKeyMissing: "Gemini API Key가 누락되었습니다",
-  geminiVideoFetchFailed:
-    "영상을 불러오지 못했습니다. R2 URL이 공개되어 있는지 확인해 주세요.",
-  geminiVideoTooLarge: "분석 가능한 영상 크기(100MB)를 초과했습니다.",
-  geminiVideoTooLargeForBeta:
-    "영상 파일이 커서 AI 분석 준비에 오래 걸리다 실패할 수 있습니다. 30초 이하·용량 작은 mp4(H.264)로 다시 업로드해 주세요.",
+  geminiApiKeyMissing: "Gemini API 키가 없어요.",
+  geminiVideoFetchFailed: "영상을 가져오지 못했어요.",
+  geminiVideoTooLarge: videoUploadLimitHint,
+  geminiVideoTooLargeForBeta: videoUploadLimitHint,
+  geminiFileProcessingFailed:
+    "영상 분석 준비에 실패했어요. 잠시 후 「AI 분석 다시 시도」를 눌러 주세요.",
   geminiEmptyAnalysis:
-    "AI가 피드백 초안을 만들지 못했습니다. 영상이 짧고 선명한지 확인한 뒤 「AI 분석 다시 시도」를 눌러 주세요.",
+    "분석 결과가 없어요. 영상 확인 후 「AI 분석 다시 시도」를 눌러 주세요.",
   geminiNetworkInterrupted:
-    "분석 중 연결이 끊겼습니다. Wi-Fi 환경에서 새로고침 없이 「AI 분석 다시 시도」를 눌러 주세요.",
+    "연결이 끊겼어요. Wi-Fi에서 「AI 분석 다시 시도」를 눌러 주세요.",
   geminiModelNotFound:
-    "Gemini 모델을 찾을 수 없습니다. .env.local의 GEMINI_MODEL을 gemini-2.5-flash로 설정해 주세요.",
-  geminiAnalysisFailed:
-    "영상 전체 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-  geminiQuotaExceeded:
-    "Gemini API 사용 한도에 도달했습니다. Google AI Studio에서 할당량을 확인하거나 잠시 후 다시 시도해 주세요.",
-  geminiTimeout:
-    "영상 분석 시간이 초과되었습니다. Vercel Functions 시간 제한(Fluid Compute)을 켜거나 더 짧은 영상으로 다시 시도해 주세요.",
-  geminiAnalyzingVideo: "영상 전체를 분석하는 중...",
-  geminiAnalyzingVideoTitle:
-    "🤖 AI가 영상의 관절 움직임과 해부학적 자세를 정밀 분석하고 있습니다...",
-  geminiAnalyzingVideoDetail:
-    "영상 길이에 따라 보통 1~2분, 파일이 크면 최대 4분까지 걸릴 수 있습니다.",
-  geminiAnalyzingVideoHint:
-    "동시 접속이 많을 때는 대기 시간이 조금 더 걸릴 수 있습니다. 새로고침하지 말고 이 화면을 유지해 주세요.",
-  videoTooLong:
-    "현재는 30초 이하 영상만 분석할 수 있습니다. 짧은 구간으로 잘라 다시 업로드해 주세요.",
-  videoLimitExpansionNote:
-    "영상 길이·용량 제한은 추후 확장 예정입니다.",
-  videoUploadRecommended:
-    "30초 이하 · 약 22MB 이하 권장",
-  videoDurationProbeFailed:
-    "영상 길이를 확인하지 못했습니다. mp4 형식으로 다시 선택해 주세요.",
-  videoPlayTapHint:
-    "영상이 검은 화면이면 한 번 터치해 재생해 보세요. Wi-Fi에서 mp4(H.264)로 다시 업로드하면 재생이 안정적입니다.",
+    "Gemini 모델을 찾을 수 없어요. GEMINI_MODEL을 gemini-2.5-flash로 설정해 주세요.",
+  geminiAnalysisFailed: "분석에 실패했어요. 잠시 후 다시 시도해 주세요.",
+  geminiQuotaExceeded: "AI 사용 한도에 도달했어요. 잠시 후 다시 시도해 주세요.",
+  geminiTimeout: "분석 시간이 초과됐어요. 영상을 짧게 줄이거나 잠시 후 다시 시도해 주세요.",
+  geminiAnalyzingVideo: "영상 분석 중…",
+  geminiAnalyzingVideoTitle: "AI가 영상을 분석하고 있어요…",
+  geminiAnalyzingVideoDetail: "보통 1~2분 걸려요. 파일이 크면 조금 더 걸릴 수 있어요.",
+  geminiAnalyzingVideoHint: "새로고침하지 말고 이 화면을 유지해 주세요.",
+  videoTooLong: `영상이 길어요. ${MAX_VIDEO_DURATION_SEC}초 이하로 잘라서 다시 올려 주세요.`,
+  videoLimitExpansionNote: "길이·용량 제한은 추후 늘릴 예정이에요.",
+  videoUploadRecommended: `${MAX_VIDEO_DURATION_SEC}초 이하 · ${MAX_VIDEO_FILE_MB}MB 미만 권장`,
+  videoDurationProbeFailed: "영상 정보를 읽지 못했어요. mp4로 다시 선택해 주세요.",
+  videoPlayTapHint: "검은 화면이면 영상을 한 번 터치해 보세요.",
   geminiRetryAnalysis: "AI 분석 다시 시도",
 } as const;
 
@@ -165,18 +140,18 @@ export function mapGeminiVideoError(message?: string): string {
     lower.includes("deadline") ||
     lower.includes("function_invocation") ||
     lower.includes("aborted") ||
-    lower.includes("504")
+    lower.includes("504") ||
+    lower.includes("timeouterror")
   ) {
     return USER_MESSAGES.geminiTimeout;
   }
   if (
     lower.includes("bulk analysis limit") ||
-    lower.includes("exceeds bulk")
+    lower.includes("exceeds bulk") ||
+    lower.includes("maximum size") ||
+    lower.includes("too large")
   ) {
     return USER_MESSAGES.geminiVideoTooLargeForBeta;
-  }
-  if (lower.includes("maximum size") || lower.includes("too large")) {
-    return USER_MESSAGES.geminiVideoTooLarge;
   }
   if (
     lower.includes("empty response") ||
@@ -186,7 +161,7 @@ export function mapGeminiVideoError(message?: string): string {
     return USER_MESSAGES.geminiEmptyAnalysis;
   }
   if (lower.includes("file processing")) {
-    return USER_MESSAGES.geminiVideoTooLargeForBeta;
+    return USER_MESSAGES.geminiFileProcessingFailed;
   }
   if (lower.includes("30초") || lower.includes("30 sec")) {
     return USER_MESSAGES.videoTooLong;
